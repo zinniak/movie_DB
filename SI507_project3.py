@@ -15,24 +15,46 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app) # For database use
 session = db.session # to make queries easy
 
+# Setting up models
 
-class Movie:
+class Movie(db.Model):
     __tablename__ = 'movies'
     id = db.Column(db.Integer,primary_key=True)
     title = db.Column(db.String(64))
+    mpaa = db.Column(db.String(10))
     imdb = db.Column(db.String(10))
-    # songs = db.relationship('')
-
-    def __init__(self,row):
-        self.title = row[1]
-        self.mrating = row[7]
-        self.distributor = row[9]
-        self.genre = row[11]
-        self.director = row[13]
-        self.imdb = row[15]
+    movie_director = Column(db.String(64), ForeignKey('Directors.id'))
+    movie_distributor = Column(db.String(64))
+    director = relationship('directors')
+    distributor = relationship('distributors')
 
     def __repr__(self):
-        return "{} | {}".format(self.title,self.imdb)
+        return "{} | {}".format(self.title,self.mpaa)
+
+class Director:
+    __tablename__ = 'directors'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64))
+    dob = db.Column(db.Date)
+    dod = db.Column(db.Date)
+    home = db.Column(db.String(64))
+
+    # one many
+    def __repr__(self):
+        return "{} from {}".format(self.name,self.home)
+
+class MajorGenre:
+    __tablename__ = 'genre'
+    id = db.Column(db.Integer, primary_key=True)
+    genre = db.Column(db.String(64))
+
+class Distributor:
+    __tablename__: 'distributors'
+    id
+    name
+    #one-many
+    pass
+
 
 def movie_count(data):
     return len(data)
