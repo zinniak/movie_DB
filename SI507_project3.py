@@ -7,7 +7,7 @@ app.debug = true
 app.use_reloader = true
 app.config['SECRET_KEY'] = 'asdadafaads'
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///./sample_songs.db' # TODO: decide what your new database name will be -- that has to go here
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///./sample_movies.db' # TODO: decide what your new database name will be -- that has to go here
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -23,10 +23,9 @@ class Movie(db.Model):
     title = db.Column(db.String(64))
     mpaa = db.Column(db.String(10))
     imdb = db.Column(db.String(10))
-    movie_director = Column(db.String(64), ForeignKey('Directors.id'))
-    movie_distributor = Column(db.String(64))
-    director = relationship('directors')
-    distributor = relationship('distributors')
+    genre = db.Column(db.String(64))
+    director_id = db.Column(db.String(64), db.ForeignKey('directors.id'))
+    distributor_id = db.Column(db.String(64),db.ForeignKey('distributors.id'))
 
     def __repr__(self):
         return "{} | {}".format(self.title,self.mpaa)
@@ -38,6 +37,7 @@ class Director:
     dob = db.Column(db.Date)
     dod = db.Column(db.Date)
     home = db.Column(db.String(64))
+    movies = db.relationship('Movie',backref='Director')
 
     # one many
     def __repr__(self):
@@ -48,23 +48,37 @@ class MajorGenre:
     id = db.Column(db.Integer, primary_key=True)
     genre = db.Column(db.String(64))
 
+    def __repr__(self):
+        return (genre)
+
 class Distributor:
     __tablename__: 'distributors'
-    id
-    name
-    #one-many
-    pass
+    id = db.Column(db.Integer,primary_key=True)
+    name = db.Column(db.String(64))
+    movies = db.relationship('Movie',backref='Distributor')
+
+    def __repr__(self):
+        return (name)
 
 
+# Helper Functions
 def movie_count(data):
     return len(data)
 
-def get_or_create_artist(artist_name):
-    artist = Artist.query.filter_by(name=artist_name).first()
-    if artist:
-        return artist
+def get_or_create_director(director_name):
+    director = Director.query.filder_by(name=director_name).first()
+    if director:
+        return director
     else:
-        artist = Artist(name=artist_name)
-        session.add(artist)
+        director = Director(name=director_name)
+        session.add(director)
         session.commit()
-        return artist
+        return director
+
+
+# Setting up Controllers
+@app.route('/')
+def index():
+    movies = Movie.query.all()
+    num_movies = len(movies)
+    return render_template('index.html',num_songs) # create template
