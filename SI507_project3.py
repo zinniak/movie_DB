@@ -15,7 +15,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app) # For database use
 session = db.session # to make queries easy
 
-# Setting up models
+##### Setting up models #####
 
 class Director(db.Model):
     __tablename__ = "directors"
@@ -26,7 +26,6 @@ class Director(db.Model):
     home = db.Column(db.String(64))
     movies = db.relationship('Movie',backref='Director')
 
-    # one many
     def __repr__(self):
         return "{} from {}".format(self.name,self.home)
 
@@ -60,9 +59,7 @@ class Movie(db.Model):
     def __repr__(self):
         return "{} | {}".format(self.title,self.mpaa)
 
-# Helper Functions
-def movie_count(data):
-    return len(data)
+##### Helper Functions####
 
 def get_or_create_director(name, home='', dob='', dod=''):
     director = Director.query.filter_by(name=name).first()
@@ -95,7 +92,7 @@ def get_or_create_distributor(distributor_name):
         session.commit()
         return name
 
-#### Setting up controllers
+##### Setting up controllers #####
 
 # route for home page
 @app.route('/')
@@ -131,25 +128,31 @@ def new_distributor(name):
         distributor = get_or_create_distributor(name)
         return "New Distributor added: {}".format(distributor.name)
 
-#route to create new movie
-# @app.route('/new/movie/<title>/<mpaa>/<director>/<distributor>')
-# def new_movie(title,genre,director,distributor):
-#     if Movie.query.filter_by(title=title).first():
-#         return "This Movie already exists in the database. Please go back to the home page"
-#     else:
-#         director = get_or_create_director(director)
-#         distributor = get_or_create_distributor(distributor)
-#         movie = Movie(title=title,director_id=director.id,genre=genre.id)
-#         session.add(movie)
-#         session.commit()
-#         return "New movie: {} directed by - {}".format(movie.title,director.name)
-#
-# @app.route('/all_movies')
-# def see_all_movies():
-#     all_movies = []
-#     movies = Movie.query.all()
-#     for m in movies:
-        imdb
+# route to create new movie
+@app.route('/new/movie/<title>/<mpaa>/<genre>/<director>/<distributor>')
+def new_movie(title,mpaa,genre,director,distributor):
+    if Movie.query.filter_by(title=title).first():
+        return "This Movie already exists in the database. Please go back to the home page"
+    else:
+        director = get_or_create_director(director)
+        genre = get_or_create_genre(genre)
+        distributor = get_or_create_distributor(distributor)
+        movie = Movie(title=title,mpaa= mpaa,director_id=director.id,genre_id=genre.id,distributor_id=distributor.id)
+        session.add(movie)
+        session.commit()
+        return "New {} rated movie: {}".format(movie.mpaa,movie.title)
+
+# route to get a list of all movies
+@app.route('/all_movies')
+def see_all_movies():
+    all_movies = []
+    movies = Movie.query.all()
+    for m in movies:
+        genre = Genre.query.filter_by(id=m.genre_id).first()
+        director = Director.query.filter_by(id=m.director_id).first()
+        distributor = Distributor.query.filter_by(id=m.distributor_id).first()
+        all_movies.append((m.title,m.mpaa,genre.name,director.name,distributor.name))
+    return render_template('all_movies.html',all_movies=all_movies)
 
 if __name__ == '__main__':
     db.create_all()
