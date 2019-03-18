@@ -4,17 +4,17 @@ The **SI507_Project3.py** is a Flask application for a movie database. The appli
 
 ## Flask Routes
 There are 6 routes in the Flask application:
-1. **/**
+1. `/`
 * This route is for the home page that shows the number of movies in the database.
-2. **/new/director/<name>/<home>/<dob>/<dod>**
+2. `/new/director/<name>/<home>/<dob>/<dod>`
 * This route adds a director and their home town, date of birth, and data of death to the database in a director table. If the director already exists, it displays a message accordingly.
-3. **/new/genre/<name>**
+3. `/new/genre/<name>`
 * This route adds a genre to the database in a genre table. If the genre already exists, it displays a message accordingly.
-4. **/new/distributor/<name>'**
+4. `/new/distributor/<name>`
 * This route adds a distributor to the database in a distributor table. If the distributor already exists, it displays a message accordingly.
-5. **/new/movie/<title>/<mpaa>/<genre>/<director>/<distributor>**
+5. `/new/movie/<title>/<mpaa>/<genre>/<director>/<distributor>`
 * This route creates a movie in the database. It checks to see if the movie title already exists, if it does not, it creates the movie. It also checks to see if the director, distributor, and genre already exist. If they do not, it creates them and adds them to their respective tables.
-6. **/all_movies**
+6. `/all_movies` 
 * This route shows a list of all movies along with their MPAA rating, director, and distributor.
 
 ## How to Run the Flask Application
